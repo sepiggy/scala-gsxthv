@@ -3,12 +3,11 @@ package ch02
 import ch02.Option.ops.optionOps
 import ch02.Option.syntax.optionSyntax
 
-/*
- Option
- 装有某种特定对象的容器
- 要么一个对象也没有
- 要么有一个对象
-*/
+/**
+ * Option的特征(trait): 装有某种特定对象的容器
+ * 要么一个对象也没有
+ * 要么有一个对象
+ */
 
 // 协变
 // sealed用来约束trait
@@ -84,8 +83,6 @@ object Option {
 
 }
 
-// None: 啥都没有
-// Nothing: 啥也不是
 case object None extends Option[Nothing]
 
 // get是属性名
@@ -99,9 +96,11 @@ private[ch02] class OptionOps[+A](a: A) {
 
 private[ch02] class OptionSyntax[A](option: Option[A]) {
   def map[B](f: A => B): Option[B] = Option.map(option)(f)
+
+  def flatMap[B](f: A => Option[B]): Option[B] = Option.flatMap(option)(f)
 }
 
-object Main {
+object OptionMain {
   def main(args: Array[String]): Unit = {
     println(1.some)
     println(1.none)
@@ -112,6 +111,19 @@ object Main {
 
     println(1.some.map(_ + 1))
 
-    1.some
+    def div(a: Double, b: Double): Option[Double] =
+      b match {
+        case 0.0 => b.none
+        case _ => (a / b).some
+      }
+
+    println(1.some.map(_ + 1).map(_.toDouble).flatMap(x => div(x, 0)))
+
+    println(for {
+      x <- 1.some
+      y <- (x + 1).some
+      z <- y.toDouble.some
+      a <- div(z, 0)
+    } yield a)
   }
 }
